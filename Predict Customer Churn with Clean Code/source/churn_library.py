@@ -5,7 +5,11 @@
 import os
 os.environ['QT_QPA_PLATFORM']='offscreen'
 
-
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns; sns.set()
+from source.constants import *
 
 def import_data(pth):
     '''
@@ -16,7 +20,9 @@ def import_data(pth):
     output:
             df: pandas dataframe
     '''	
-    pass
+    df = pd.read_csv(pth)
+
+    return df
 
 
 def perform_eda(df):
@@ -28,7 +34,35 @@ def perform_eda(df):
     output:
             None
     '''
-    pass
+    # Save Churn Histogram plot
+    fig = plt.figure(figsize=(20,10)) 
+    ax = df['Churn'].hist();
+    ax.set_title('Churn Histogram')
+    fig.savefig(IMAGES_PATH / 'churn_histogram.png')
+
+    # Save Customer Age Histogram plot
+    fig = plt.figure(figsize=(20,10)) 
+    ax = df['Customer_Age'].hist();
+    ax.set_title('Customer Age Histogram')
+    fig.savefig(IMAGES_PATH / 'customer_age.png')
+
+    # Save Marital Status Bar plot
+    fig = plt.figure(figsize=(20,10)) 
+    ax = df.Marital_Status.value_counts('normalize').plot(kind='bar')
+    ax.set_title('Marital Status Bar Plot (Normalized)')
+    fig.savefig(IMAGES_PATH / 'marital_status.png')
+
+    # Save Total Transactions Histogram plot
+    fig = plt.figure(figsize=(20,10)) 
+    ax = sns.histplot(df['Total_Trans_Ct'], stat='density', kde=True)
+    ax.set_title('Total Transactions Histogram (KDE)')
+    fig.savefig(IMAGES_PATH / 'total_trans.png')
+
+    # Save Heat Map
+    fig = plt.figure(figsize=(20,10)) 
+    ax = sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths = 2)
+    ax.set_title('Heat Map')
+    fig.savefig(IMAGES_PATH / 'heat_map.png')
 
 
 def encoder_helper(df, category_lst, response):
@@ -108,3 +142,14 @@ def train_models(X_train, X_test, y_train, y_test):
               None
     '''
     pass
+
+
+if __name__ == "__main__":
+    # Import Dataframe
+    df = import_data((DATA_PATH / 'bank_data.csv').as_posix())
+
+    # Create 'Churn' column
+    df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
+
+    # Perform EDA
+    perform_eda(df)
