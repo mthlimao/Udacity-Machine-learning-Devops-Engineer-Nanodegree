@@ -65,7 +65,7 @@ def perform_eda(df):
     fig.savefig(IMAGES_PATH / 'heat_map.png')
 
 
-def encoder_helper(df, category_lst, response):
+def encoder_helper(df, category_lst, response='Churn'):
     '''
     helper function to turn each categorical column into a new column with
     propotion of churn for each category - associated with cell 15 from the notebook
@@ -78,7 +78,19 @@ def encoder_helper(df, category_lst, response):
     output:
             df: pandas dataframe with new columns for
     '''
-    pass
+    # Categorical encoded columns
+    for col in category_lst:
+        col_lst = []
+        col_groups = df.groupby(col).mean()['Churn']
+
+        for val in df[col]:
+            col_lst.append(col_groups.loc[val])
+
+        df[f'{col}_{response}'] = col_lst
+
+    return df
+    
+    
 
 
 def perform_feature_engineering(df, response):
@@ -153,3 +165,6 @@ if __name__ == "__main__":
 
     # Perform EDA
     perform_eda(df)
+
+    # Encode Categorical Funcions
+    df = encoder_helper(df, CAT_COLUMNS)
