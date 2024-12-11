@@ -5,10 +5,21 @@
 import os
 os.environ['QT_QPA_PLATFORM']='offscreen'
 
+import shap
+import joblib
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns; sns.set()
+
+from sklearn.preprocessing import normalize
+from sklearn.model_selection import train_test_split
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import GridSearchCV
+
+from sklearn.metrics import plot_roc_curve, classification_report
 from source.constants import *
 
 def import_data(pth):
@@ -89,8 +100,6 @@ def encoder_helper(df, category_lst, response='Churn'):
         df[f'{col}_{response}'] = col_lst
 
     return df
-    
-    
 
 
 def perform_feature_engineering(df, response):
@@ -161,10 +170,16 @@ if __name__ == "__main__":
     df = import_data((DATA_PATH / 'bank_data.csv').as_posix())
 
     # Create 'Churn' column
-    df['Churn'] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
+    df[TARGET_COLUMN] = df['Attrition_Flag'].apply(lambda val: 0 if val == "Existing Customer" else 1)
 
     # Perform EDA
     perform_eda(df)
 
     # Encode Categorical Funcions
-    df = encoder_helper(df, CAT_COLUMNS)
+    df = encoder_helper(df, CAT_COLUMNS, TARGET_COLUMN)
+
+    # Define X and y
+    X, y = df[KEEP_COLUMNS], df[TARGET_COLUMN]
+
+    # train test split 
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size= 0.3, random_state=42)
