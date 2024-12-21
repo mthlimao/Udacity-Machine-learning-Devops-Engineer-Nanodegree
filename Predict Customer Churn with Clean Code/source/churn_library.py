@@ -47,13 +47,13 @@ def perform_eda(df):
     '''
     # Save Churn Histogram plot
     fig = plt.figure(figsize=(20,10)) 
-    ax = df['Churn'].hist();
+    ax = df['Churn'].hist()
     ax.set_title('Churn Histogram')
     fig.savefig(IMAGES_PATH / 'churn_histogram.png')
 
     # Save Customer Age Histogram plot
     fig = plt.figure(figsize=(20,10)) 
-    ax = df['Customer_Age'].hist();
+    ax = df['Customer_Age'].hist()
     ax.set_title('Customer Age Histogram')
     fig.savefig(IMAGES_PATH / 'customer_age.png')
 
@@ -238,7 +238,14 @@ def feature_importance_plot(model, X_data, output_pth):
     output:
              None
     '''
-    pass
+    explainer = shap.TreeExplainer(model)
+    shap_values = explainer.shap_values(X_data)
+    
+    fig = plt.figure()
+    ax = shap.summary_plot(shap_values, X_data, plot_type="bar")
+    ax = plt.gca()
+    ax.set_title('Features Importance')
+    fig.savefig(output_pth / 'features_importance.png')
 
 
 def train_models(X_train, X_test, y_train, y_test):
@@ -277,6 +284,15 @@ def train_models(X_train, X_test, y_train, y_test):
     # Generate classification reports images
     classification_report_image(y_train, y_test, y_train_preds_lr, y_train_preds_rf, y_test_preds_lr, y_test_preds_rf)
 
+    # Generate features importance plot
+    feature_importance_plot(cv_rfc.best_estimator_, X_test, IMAGES_PATH)
+
+    # Save models
+    print('Saving models')
+    joblib.dump(cv_rfc, MODELS_PATH / 'rfc_model.joblib')
+    joblib.dump(lrc, MODELS_PATH / 'logistic_model.joblib')
+    print('Success')
+
 
 if __name__ == "__main__":
     # Import Dataframe
@@ -294,5 +310,5 @@ if __name__ == "__main__":
     # Perform feature engineering
     X_train, X_test, y_train, y_test = perform_feature_engineering(df[KEEP_COLUMNS + [TARGET_COLUMN]], TARGET_COLUMN)
 
-    # Train models
+    # Train and save models
     train_models(X_train, X_test, y_train, y_test)
