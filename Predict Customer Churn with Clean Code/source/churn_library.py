@@ -255,13 +255,12 @@ def roc_curves_plot(model_rf, model_lr, X_data, y_data):
     fig.savefig(IMAGES_PATH / 'roc_curves.png')
 
 
-def feature_importance_plot(model, X_data, output_pth):
+def feature_importance_plot(model, X_data):
     '''
     creates and stores the feature importances in pth
     input:
             model: model object containing feature_importances_
             X_data: pandas dataframe of X values
-            output_pth: path to store the figure
 
     output:
              None
@@ -273,7 +272,7 @@ def feature_importance_plot(model, X_data, output_pth):
     shap.summary_plot(shap_values, X_data, plot_type="bar")
     ax = plt.gca()
     ax.set_title('Features Importance')
-    fig.savefig(output_pth / 'features_importance.png')
+    fig.savefig(IMAGES_PATH / 'features_importance.png')
 
 
 def train_models(X_train, X_test, y_train, y_test):
@@ -313,9 +312,9 @@ def train_models(X_train, X_test, y_train, y_test):
     classification_report_image(y_train, y_test, y_train_preds_lr, y_train_preds_rf, y_test_preds_lr, y_test_preds_rf)
 
     # Generate features importance plot
-    feature_importance_plot(cv_rfc.best_estimator_, X_test, IMAGES_PATH)
+    feature_importance_plot(cv_rfc.best_estimator_, X_test)
 
-    # Save ROC curves
+    # Generate ROC curves
     roc_curves_plot(cv_rfc.best_estimator_, lrc, X_test, y_test)
 
     # Save models
