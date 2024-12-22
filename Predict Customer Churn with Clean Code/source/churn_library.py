@@ -348,8 +348,8 @@ def train_models(X_train, X_test, y_train, y_test):
 
     # Save models
     print('Saving models')
-    joblib.dump(cv_rfc, MODELS_PATH / 'rfc_model.joblib')
-    joblib.dump(lrc, MODELS_PATH / 'logistic_model.joblib')
+    joblib.dump(cv_rfc, MODELS_PATH / 'rfc_model.pkl')
+    joblib.dump(lrc, MODELS_PATH / 'logistic_model.pkl')
     print('Success')
 
 

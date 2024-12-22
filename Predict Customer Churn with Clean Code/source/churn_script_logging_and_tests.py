@@ -239,8 +239,8 @@ def test_train_models(df_featurized):
 
     # Check if models are saved
     try:
-        assert (MODELS_PATH / 'rfc_model.joblib').exists()
-        assert (MODELS_PATH / 'logistic_model.joblib').exists()
+        assert (MODELS_PATH / 'rfc_model.pkl').exists()
+        assert (MODELS_PATH / 'logistic_model.pkl').exists()
     except AssertionError as err:
         logging.error("Testing train_models: One or more models were not created.")
         raise err
