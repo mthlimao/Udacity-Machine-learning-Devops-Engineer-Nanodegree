@@ -1,0 +1,16 @@
+x-app: &default-app
+  restart: always
+
+name: clean_code
+
+services:
+  clean_code_udacity:
+    <<: *default-app
+    build: 
+      dockerfile: ./Dockerfile
+      context: .
+    container_name: clean_code
+    volumes:
+      - ./source:/source
+      - ./models:/models
+      - ./images:/images
