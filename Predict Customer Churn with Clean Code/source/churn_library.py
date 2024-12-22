@@ -1,23 +1,25 @@
-# library doc string
+'''
+File containing functions to load and preprocess data
+and to train ML models to predict churn.
 
-
-# import libraries
+Author: Matheus Scramignon
+'''
+import os
+import shap
+import joblib
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 import seaborn as sns
-from source.constants import *
 from sklearn.metrics import plot_roc_curve, classification_report
 from sklearn.model_selection import GridSearchCV
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import normalize
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-import joblib
-import shap
-import os
-os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+from source.constants import (DATA_PATH, IMAGES_PATH, MODELS_PATH, TARGET_COLUMN,
+                             CAT_COLUMNS, KEEP_COLUMNS)
 
+os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 sns.set()
 
 
@@ -30,82 +32,84 @@ def import_data(pth):
     output:
             df: pandas dataframe
     '''
-    df = pd.read_csv(pth)
-
-    return df
+    return pd.read_csv(pth)
 
 
-def perform_eda(df):
+def perform_eda(df_churn):
     '''
     perform eda on df and save figures to images folder
     input:
-            df: pandas dataframe
+            df_churn: pandas dataframe
 
     output:
             None
     '''
     # Save Churn Histogram plot
     fig = plt.figure(figsize=(20, 10))
-    ax = df['Churn'].hist()
-    ax.set_title('Churn Histogram')
+    ax_hist = df_churn['Churn'].hist()
+    ax_hist.set_title('Churn Histogram')
     fig.savefig(IMAGES_PATH / 'churn_histogram.png')
 
     # Save Customer Age Histogram plot
     fig = plt.figure(figsize=(20, 10))
-    ax = df['Customer_Age'].hist()
-    ax.set_title('Customer Age Histogram')
+    ax_hist = df_churn['Customer_Age'].hist()
+    ax_hist.set_title('Customer Age Histogram')
     fig.savefig(IMAGES_PATH / 'customer_age.png')
 
     # Save Marital Status Bar plot
     fig = plt.figure(figsize=(20, 10))
-    ax = df.Marital_Status.value_counts('normalize').plot(kind='bar')
-    ax.set_title('Marital Status Bar Plot (Normalized)')
+    ax_bar = df_churn.Marital_Status.value_counts('normalize').plot(kind='bar')
+    ax_bar.set_title('Marital Status Bar Plot (Normalized)')
     fig.savefig(IMAGES_PATH / 'marital_status.png')
 
     # Save Total Transactions Histogram plot
     fig = plt.figure(figsize=(20, 10))
-    ax = sns.histplot(df['Total_Trans_Ct'], stat='density', kde=True)
-    ax.set_title('Total Transactions Histogram (KDE)')
+    ax_hist = sns.histplot(df_churn['Total_Trans_Ct'], stat='density', kde=True)
+    ax_hist.set_title('Total Transactions Histogram (KDE)')
     fig.savefig(IMAGES_PATH / 'total_trans.png')
 
     # Save Heat Map
     fig = plt.figure(figsize=(20, 10))
-    ax = sns.heatmap(df.corr(), annot=False, cmap='Dark2_r', linewidths=2)
-    ax.set_title('Heat Map')
+    ax_heat = sns.heatmap(df_churn.corr(), annot=False, cmap='Dark2_r', linewidths=2)
+    ax_heat.set_title('Heat Map')
     fig.savefig(IMAGES_PATH / 'heat_map.png')
 
 
-def encoder_helper(df, category_lst, response='Churn'):
+def encoder_helper(df_churn, category_lst, response='Churn'):
     '''
     helper function to turn each categorical column into a new column with
     propotion of churn for each category - associated with cell 15 from the notebook
 
     input:
-            df: pandas dataframe
+            df_churn: pandas dataframe
             category_lst: list of columns that contain categorical features
-            response: string of response name [optional argument that could be used for naming variables or index y column]
+            response: string of response name [optional argument that could
+                      be used for naming variables or index y column]
 
     output:
-            df: pandas dataframe with new columns for
+            df_encoded: pandas dataframe with new encoded columns
     '''
+    df_encoded = df_churn.copy()
+
     # Categorical encoded columns
     for col in category_lst:
         col_lst = []
-        col_groups = df.groupby(col).mean()['Churn']
+        col_groups = df_encoded.groupby(col).mean()['Churn']
 
-        for val in df[col]:
+        for val in df_encoded[col]:
             col_lst.append(col_groups.loc[val])
 
-        df[f'{col}_{response}'] = col_lst
+        df_encoded[f'{col}_{response}'] = col_lst
 
-    return df
+    return df_encoded
 
 
-def perform_feature_engineering(df, response='Churn'):
+def perform_feature_engineering(df_encoded, response='Churn'):
     '''
     input:
-              df: pandas dataframe
-              response: string of response name [optional argument that could be used for naming variables or index y column]
+              df_encoded: pandas dataframe
+              response: string of response name [optional argument that could
+                        be used for naming variables or index y column]
 
     output:
               X_train: X training data
@@ -114,14 +118,13 @@ def perform_feature_engineering(df, response='Churn'):
               y_test: y testing data
     '''
     # Define X and y
-    X_columns = [col for col in df.columns.tolist() if col != response]
-    X, y = df[X_columns], df[response]
+    columns = [col for col in df_encoded.columns.tolist() if col != response]
 
     # train test split
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.3, random_state=42)
-
-    return X_train, X_test, y_train, y_test
+    return train_test_split(
+        df_encoded[columns], df_encoded[response],
+        test_size=0.3, random_state=42
+    )
 
 
 def classification_report_image(y_train,
@@ -188,7 +191,8 @@ def plot_classification_report(report, output_folder, filename):
     Plots the classification report as an image and saves it to a specified folder.
 
     input:
-        report (str): The classification report string generated by sklearn.metrics.classification_report.
+        report (str): The classification report string generated by
+                      sklearn.metrics.classification_report.
         output_folder (str): Path to the folder where the image will be saved.
         filename (str): Name of the saved image file (default: 'classification_report.png').
 
@@ -260,17 +264,17 @@ def roc_curves_plot(model_rf, model_lr, X_data, y_data):
              None
     '''
 
-    fig, ax = plt.subplots()
-    rf_plot = plot_roc_curve(model_rf, X_data, y_data, ax=ax)
+    fig, ax_roc = plt.subplots()
+    plot_roc_curve(model_rf, X_data, y_data, ax=ax_roc)
     fig.savefig(IMAGES_PATH / 'roc_random_forest.png')
 
-    fig, ax = plt.subplots()
-    lrc_plot = plot_roc_curve(model_lr, X_data, y_data, ax=ax)
+    fig, ax_roc = plt.subplots()
+    lrc_plot = plot_roc_curve(model_lr, X_data, y_data, ax=ax_roc)
     fig.savefig(IMAGES_PATH / 'roc_logistic_regression.png')
 
-    fig, ax = plt.subplots(figsize=(15, 8))
-    rfc_disp = plot_roc_curve(model_rf, X_data, y_data, ax=ax, alpha=0.8)
-    lrc_plot.plot(ax=ax, alpha=0.8)
+    fig, ax_roc = plt.subplots(figsize=(15, 8))
+    plot_roc_curve(model_rf, X_data, y_data, ax=ax_roc, alpha=0.8)
+    lrc_plot.plot(ax=ax_roc, alpha=0.8)
     fig.savefig(IMAGES_PATH / 'roc_curves.png')
 
 
@@ -289,8 +293,8 @@ def feature_importance_plot(model, X_data):
 
     fig = plt.figure()
     shap.summary_plot(shap_values, X_data, plot_type="bar")
-    ax = plt.gca()
-    ax.set_title('Features Importance')
+    ax_shap = plt.gca()
+    ax_shap.set_title('Features Importance')
     fig.savefig(IMAGES_PATH / 'features_importance.png')
 
 
@@ -364,8 +368,8 @@ if __name__ == "__main__":
     df = encoder_helper(df, CAT_COLUMNS, TARGET_COLUMN)
 
     # Perform feature engineering
-    X_train, X_test, y_train, y_test = perform_feature_engineering(
+    X_train_, X_test_, y_train_, y_test_ = perform_feature_engineering(
         df[KEEP_COLUMNS + [TARGET_COLUMN]], TARGET_COLUMN)
 
     # Train and save models related files
-    train_models(X_train, X_test, y_train, y_test)
+    train_models(X_train_, X_test_, y_train_, y_test_)
