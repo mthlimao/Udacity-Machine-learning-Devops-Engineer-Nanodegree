@@ -227,6 +227,34 @@ def plot_classification_report(report, output_folder, filename):
     print(f"Classification report saved to {output_path}")
 
 
+def roc_curves_plot(model_rf, model_lr, X_data, y_data):
+    '''
+    creates and stores the feature importances in pth
+    input:
+            model_rf: model object containing random forest model
+            model_lr: model object containing logistic regression model
+            X_data: pandas dataframe of X values
+            y_data: array of y values
+            outputs_pth: paths to store the figures
+
+    output:
+             None
+    '''
+
+    fig, ax = plt.subplots()
+    rf_plot = plot_roc_curve(model_rf, X_data, y_data, ax=ax)
+    fig.savefig(IMAGES_PATH / 'roc_random_forest.png')
+    
+    fig, ax = plt.subplots()
+    lrc_plot = plot_roc_curve(model_lr, X_data, y_data, ax=ax)
+    fig.savefig(IMAGES_PATH / 'roc_logistic_regression.png')
+    
+    fig, ax = plt.subplots(figsize=(15, 8))
+    rfc_disp = plot_roc_curve(model_rf, X_data, y_data, ax=ax, alpha=0.8)
+    lrc_plot.plot(ax=ax, alpha=0.8)
+    fig.savefig(IMAGES_PATH / 'roc_curves.png')
+
+
 def feature_importance_plot(model, X_data, output_pth):
     '''
     creates and stores the feature importances in pth
@@ -242,7 +270,7 @@ def feature_importance_plot(model, X_data, output_pth):
     shap_values = explainer.shap_values(X_data)
     
     fig = plt.figure()
-    ax = shap.summary_plot(shap_values, X_data, plot_type="bar")
+    shap.summary_plot(shap_values, X_data, plot_type="bar")
     ax = plt.gca()
     ax.set_title('Features Importance')
     fig.savefig(output_pth / 'features_importance.png')
@@ -287,6 +315,9 @@ def train_models(X_train, X_test, y_train, y_test):
     # Generate features importance plot
     feature_importance_plot(cv_rfc.best_estimator_, X_test, IMAGES_PATH)
 
+    # Save ROC curves
+    roc_curves_plot(cv_rfc.best_estimator_, lrc, X_test, y_test)
+
     # Save models
     print('Saving models')
     joblib.dump(cv_rfc, MODELS_PATH / 'rfc_model.joblib')
@@ -310,5 +341,5 @@ if __name__ == "__main__":
     # Perform feature engineering
     X_train, X_test, y_train, y_test = perform_feature_engineering(df[KEEP_COLUMNS + [TARGET_COLUMN]], TARGET_COLUMN)
 
-    # Train and save models
+    # Train and save models related files
     train_models(X_train, X_test, y_train, y_test)
