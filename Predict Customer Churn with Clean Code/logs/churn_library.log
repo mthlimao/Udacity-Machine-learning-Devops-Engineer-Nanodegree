@@ -1,0 +1,15 @@
+root - INFO -  About to start the tests 
+root - INFO - Testing import_data: SUCCESS
+root - INFO - Testing import_data: SUCCESS
+root - INFO - Testing perform_eda: IMAGES_PATH exists
+root - INFO - Testing import_data: SUCCESS
+root - INFO - Testing encoder_helper: New columns successfully created.
+root - INFO - Testing encoder_helper: New columns created with sound values.
+root - INFO - Testing import_data: SUCCESS
+root - INFO - Testing perform_feature_engineering: Returned sets are not empty
+root - INFO - Testing perform_feature_engineering: Sets successfully returned by function.
+root - INFO - Testing import_data: SUCCESS
+root - INFO - Testing train_models: MODELS_PATH exists.
+root - INFO - Testing train_models: Images files successfully created.
+root - INFO - Testing train_models: Models successfully created.
+root - INFO -  Done executing the tests 
