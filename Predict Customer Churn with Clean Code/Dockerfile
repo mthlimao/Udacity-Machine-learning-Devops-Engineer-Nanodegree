@@ -24,6 +24,6 @@ RUN pip3 install --upgrade pip && \
 COPY ./data/ ./data/
 COPY ./source/ ./source/
 COPY ./notebooks/ ./notebooks/
-RUN mkdir -p ./images/ && mkdir -p ./models/
+RUN mkdir -p ./images/ && mkdir -p ./models/ && mkdir -p ./logs/
 
-ENTRYPOINT pytest source/churn_script_logging_and_tests.py
+CMD ["python", "source/churn_script_logging_and_tests.py"]

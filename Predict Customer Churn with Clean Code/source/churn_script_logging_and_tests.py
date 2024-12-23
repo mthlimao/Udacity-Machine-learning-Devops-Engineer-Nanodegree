@@ -4,6 +4,7 @@ File containing tests for churn_library.py functions.
 Author: Matheus Scramignon
 '''
 
+import os
 import logging
 import pytest
 from source.churn_library import (import_data, perform_eda, encoder_helper,
@@ -12,15 +13,18 @@ from source.constants import (
     DATA_PATH,
     IMAGES_PATH,
     MODELS_PATH,
+    LOGS_PATH,
     TARGET_COLUMN,
     CAT_COLUMNS,
     KEEP_COLUMNS)
 
 logging.basicConfig(
-    filename='./logs/churn_library.log',
+    filename=(LOGS_PATH / 'churn_library.log').as_posix(),
     level=logging.INFO,
     filemode='w',
     format='%(name)s - %(levelname)s - %(message)s')
+
+logger = logging.getLogger()
 
 
 @pytest.fixture()
@@ -249,4 +253,6 @@ def test_train_models(df_featurized):
 
 
 if __name__ == "__main__":
-    pass
+    logger.info('About to start the tests')
+    pytest.main(args=['-s', os.path.abspath(__file__)])
+    logger.info('Done executing the tests')

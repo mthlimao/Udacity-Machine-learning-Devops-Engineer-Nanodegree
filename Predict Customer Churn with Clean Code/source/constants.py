@@ -11,6 +11,7 @@ BASE_PATH = Path(__file__).resolve().parent.parent
 DATA_PATH = BASE_PATH / 'data'
 IMAGES_PATH = BASE_PATH / 'images'
 MODELS_PATH = BASE_PATH / 'models'
+LOGS_PATH = BASE_PATH / 'logs'
 
 TARGET_COLUMN = 'Churn'
 
