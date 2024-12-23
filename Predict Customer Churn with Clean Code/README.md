@@ -3,8 +3,8 @@
 - Project **Predict Customer Churn** of ML DevOps Engineer Nanodegree Udacity
 
 ## Project Description
-Your project description here.
-Project has information on customers in a certain bank, with the goal to develop a model to predict teh customers that churned, in order for the bank to be able to put measures in place to keep these and potential customers from churning in the future. This project aims 
+
+Project has information on customers in a certain bank, with the goal to develop a model to predict the customers that churned, in order for the bank to be able to put measures in place to keep these and potential customers from churning in the future. This project aims 
 to implement routines using clean code best practices to improve the code to make it into a production ready code, by refactoring, logging and testing.
 
 ## Files and data description
