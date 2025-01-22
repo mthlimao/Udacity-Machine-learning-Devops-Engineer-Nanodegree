@@ -4,19 +4,35 @@ conda_env: conda.yml
 entry_points:
   main:
     parameters:
+      input_artifact:
+        description: Fully-qualified artifact name for the input artifact
+        type: str
 
-      parameter1:
-        description: ## ADD DESCRIPTION
+      output_artifact:
+        description: Fully-qualified artifact name for the output artifact
         type: string
 
-      parameter2:
-        description: ## ADD DESCRIPTION
-        type: string
+      output_type:
+        description: Type of the output artifact to create
+        type: str
+        default: clean_sample
+      
+      output_description:
+        description: Description for the output artifact
+        type: str
+      
+      min_price:
+        description: The minimum price to consider
+        type: float
 
-      parameter3:
-        description: ## ADD DESCRIPTION
-        type: string
-
+      max_price:
+        description: The maximum price to consider
+        type: float
 
     command: >-
-        python run.py  --parameter1 {parameter1}  --parameter2 {parameter2}  --parameter3 {parameter3} 
+        python run.py  --input_artifact {input_artifact} \
+                       --output_artifact {output_artifact} \
+                       --output_type {output_type} \
+                       --output_description {output_description} \
+                       --min_price {min_price} \
+                       --max_price {max_price}
