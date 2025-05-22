@@ -56,12 +56,14 @@ The completion of this Nanodegree was verified by Udacity.
 **Date:** March 6, 2025  
 🔗 [View Certificate Online](https://www.udacity.com/certificate/e/b21ddde8-9641-11ef-9abc-2f17ef2213ce)
 
-![Udacity Certificate](https://www.udacity.com/certificate/e/b21ddde8-9641-11ef-9abc-2f17ef2213ce)
+![Udacity Certificate]
+![alt text](certification.png)
 
 ---
 
 ## 🔗 Repository Structure
 
+```bash
 Udacity-Machine-learning-Devops-Engineer-Nanodegree/
 │
 ├── Predict Customer Churn with Clean Code/ # Project 1
