@@ -1,0 +1,6 @@
+[submodule "Deploying-a-Scalable-ML-Pipeline-in-Production"]
+	path = Deploying a Scalable ML Pipeline in Production
+	url = https://github.com/mthlimao/Deploying-a-Scalable-ML-Pipeline-in-Production/
+[submodule "ML-Model-Scoring-and-Monitoring"]
+	path = ML Model Scoring and Monitoring
+	url = https://github.com/mthlimao/ML-Model-Scoring-and-Monitoring
